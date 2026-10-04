@@ -306,32 +306,11 @@
   font-weight: 500;
 }
 
-.auth-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: var(--space-xs) 0;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.auth-divider span {
-  padding: 0 12px;
-}
-
 .auth-footer-link {
   text-align: center;
   font-size: var(--text-sm);
   color: var(--text-secondary);
+  padding-top: var(--space-xs);
 }
 
 .auth-footer-link a {
@@ -366,7 +345,7 @@
   justify-content: center;
 }
 
-/* Modal for prototypes (Forgot Password / Google SSO) */
+/* Modal for prototypes (Forgot Password) */
 .auth-modal-backdrop {
   position: fixed;
   inset: 0;

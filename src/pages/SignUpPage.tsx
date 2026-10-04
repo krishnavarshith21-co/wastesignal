@@ -18,7 +18,6 @@ export default function SignUpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdUser, setCreatedUser] = useState<{ name: string; email: string; workspace: string } | null>(null);
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -322,24 +321,6 @@ export default function SignUpPage() {
                 </button>
               </form>
 
-              <div className="auth-divider">
-                <span>OR</span>
-              </div>
-
-              <button
-                type="button"
-                className="btn-secondary"
-                style={{ width: '100%' }}
-                onClick={() => setShowGoogleModal(true)}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 8v8" />
-                  <path d="M8 12h8" />
-                </svg>
-                Continue with Google
-              </button>
-
               <div className="auth-footer-link">
                 <span>Already have an account?</span>
                 <Link to="/login">Sign In</Link>
@@ -348,26 +329,6 @@ export default function SignUpPage() {
           )}
         </div>
       </div>
-
-      {/* Google SSO Prototype Disclosure Modal */}
-      {showGoogleModal && (
-        <div className="auth-modal-backdrop" onClick={() => setShowGoogleModal(false)}>
-          <div className="auth-modal-card animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 className="heading-section">Enterprise SSO Integration</h3>
-              <button className="btn-ghost" onClick={() => setShowGoogleModal(false)}>✕</button>
-            </div>
-            <p className="text-body text-secondary" style={{ lineHeight: 'var(--leading-relaxed)' }}>
-              Single Sign-On connects with municipal Google Workspace or Okta SAML. In this local prototype, please create an account directly using the form.
-            </p>
-            <div className="btn-group" style={{ justifyContent: 'flex-end' }}>
-              <button className="btn-primary" onClick={() => setShowGoogleModal(false)}>
-                Return to Registration
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

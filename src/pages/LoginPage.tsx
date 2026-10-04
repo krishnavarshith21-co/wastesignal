@@ -16,9 +16,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Modals for SSO & Forgot Password disclosures
+  // Modal for Forgot Password disclosure
   const [showForgotModal, setShowForgotModal] = useState(false);
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
 
@@ -257,24 +256,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="auth-divider">
-            <span>OR</span>
-          </div>
-
-          <button
-            type="button"
-            className="btn-secondary"
-            style={{ width: '100%' }}
-            onClick={() => setShowGoogleModal(true)}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v8" />
-              <path d="M8 12h8" />
-            </svg>
-            Continue with Google
-          </button>
-
           <div className="auth-footer-link">
             <span>Don't have an account?</span>
             <Link to="/signup">Create account</Link>
@@ -330,38 +311,6 @@ export default function LoginPage() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Google SSO Prototype Disclosure Modal */}
-      {showGoogleModal && (
-        <div className="auth-modal-backdrop" onClick={() => setShowGoogleModal(false)}>
-          <div className="auth-modal-card animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 className="heading-section">Enterprise Single Sign-On (SSO)</h3>
-              <button className="btn-ghost" onClick={() => setShowGoogleModal(false)}>✕</button>
-            </div>
-            <p className="text-body text-secondary" style={{ lineHeight: 'var(--leading-relaxed)' }}>
-              Google Workspace OAuth & SAML 2.0 single sign-on are enterprise features requiring your municipal or enterprise domain connection.
-            </p>
-            <div style={{ padding: '12px 14px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)' }}>
-              <span className="text-small">
-                To evaluate this prototype immediately, please use direct email registration or the preloaded demo account (<strong>operator@wastesignal.io</strong>).
-              </span>
-            </div>
-            <div className="btn-group" style={{ justifyContent: 'flex-end' }}>
-              <button className="btn-secondary" onClick={() => setShowGoogleModal(false)}>Close</button>
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  setShowGoogleModal(false);
-                  handleQuickFillDemo();
-                }}
-              >
-                Use Demo Account
-              </button>
-            </div>
           </div>
         </div>
       )}
