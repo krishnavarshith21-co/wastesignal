@@ -1,0 +1,147 @@
+.predictions-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.predictions-chart-legend {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-md);
+}
+
+.predictions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+.predictions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.prediction-card {
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: var(--white);
+}
+
+.prediction-card:hover {
+  border-color: var(--soft-stone);
+  background: var(--bg-hover);
+}
+
+.prediction-card.selected {
+  border-color: var(--deep-graphite);
+  background: var(--bg-hover);
+}
+
+.prediction-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.prediction-card-zone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.prediction-day {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.prediction-card-metrics {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.prediction-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prediction-risk-val {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.prediction-recurrence {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.prediction-explain {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-xl));
+}
+
+.explain-signals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.explain-signal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-md);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.explain-signal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.explain-signal-type {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-secondary);
+}
+
+.prediction-explain-notice {
+  padding: var(--space-md);
+  text-align: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.prediction-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .predictions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .predictions-list {
+    max-height: 400px;
+  }
+}

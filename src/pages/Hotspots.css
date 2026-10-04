@@ -1,0 +1,53 @@
+.hotspots-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.page-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.hotspots-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.hotspot-zone-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zone-name-sub {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.trend-indicator {
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.trend-indicator.up {
+  color: var(--terracotta);
+}
+
+.trend-indicator.down {
+  color: var(--olive);
+}
+
+.trend-indicator.stable {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .page-top {
+    flex-direction: column;
+  }
+}

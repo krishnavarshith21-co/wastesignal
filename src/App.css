@@ -1,0 +1,10 @@
+/* App-level shell adjustments */
+.app-layout {
+  position: relative;
+  background-color: var(--warm-mineral);
+  min-height: 100vh;
+}
+
+.page-content {
+  animation: fadeIn var(--transition-base) ease;
+}

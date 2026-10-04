@@ -1,0 +1,191 @@
+.datasources-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.datasources-top-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.datasources-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--olive);
+  color: var(--olive);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.datasources-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 900px) {
+  .datasources-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ds-kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+}
+
+.ds-kpi-val {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--deep-graphite);
+}
+
+.datasources-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .datasources-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.datasources-table {
+  margin: 0;
+  border: none;
+}
+
+.datasources-table tr.selected-row {
+  background: var(--bg-elevated);
+}
+
+.ds-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ds-title {
+  font-weight: 600;
+  color: var(--deep-graphite);
+}
+
+/* Detail inspection sidebar */
+.ds-detail-card {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.ds-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.ds-detail-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+}
+
+.ds-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ds-payload-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.ds-payload-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ds-code-block {
+  background: var(--near-black);
+  color: #B8C29D;
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  overflow-x: auto;
+}
+
+.ds-detail-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+/* Audit Log styling */
+.ds-audit-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ds-audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.ds-audit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.ds-audit-row:hover {
+  background: var(--bg-elevated);
+}
+
+.ds-audit-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 250px;
+}
+
+.ds-audit-source {
+  font-weight: 500;
+  color: var(--deep-graphite);
+}
+
+.ds-audit-msg {
+  color: var(--muted-graphite);
+  flex: 1;
+  padding: 0 var(--space-md);
+}
+
+.ds-audit-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}

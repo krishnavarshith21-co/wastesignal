@@ -1,0 +1,58 @@
+.operations-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.operations-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.operations-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.ops-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intervention-card {
+  margin-bottom: var(--space-md);
+}
+
+.intervention-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.intervention-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.interventions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (max-width: 1024px) {
+  .operations-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .operations-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
