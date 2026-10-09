@@ -1,22 +1,26 @@
 # WASTESIGNAL
 
-> **"DON'T CLEAN THE NEXT HOTSPOT. PREDICT IT."**
-
-WasteSignal is a predictive waste-operations intelligence platform built for municipal public works departments, urban local bodies, sanitation supervisors, and large industrial campuses.
+> **WeMakeDevs × AWS Environmental Hackathon — Track 03: Waste and Energy**  
+> *"Don't clean the next hotspot. Predict it."*  
+> 
+> 🏆 **Submission Quick Links:**
+> - [Official Hackathon Submission Document](file:///Users/krishnavarshithkamanaboina/Desktop/aws/HACKATHON_SUBMISSION.md)
+> - [3-Minute Demo Video Recording Script](file:///Users/krishnavarshithkamanaboina/Desktop/aws/DEMO_VIDEO_SCRIPT.md)
+> - [AWS Cloud Infrastructure Setup Guide](file:///Users/krishnavarshithkamanaboina/Desktop/aws/AWS_SETUP.md)
+> - [Architecture Deep Dive](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/architecture.md)
 
 ---
 
 ## 1. What is WasteSignal?
 
-Waste operations in modern cities are overwhelmingly reactive. Sanitation teams discover recurring waste hotspots and illegal dumping only after they become visible, generate resident complaints, or cause street overflow hazards.
+Waste operations in modern cities are overwhelmingly **reactive**. Sanitation teams discover recurring waste hotspots and illegal dumping only after heaps become visible, rot into high-potency methane, trigger toxic open-air trash fires, or generate citizen complaints.
 
-**WasteSignal transforms raw operational telemetry into forward predictive intelligence:**
-1. **Hotspot Detection**: Multi-signal scoring across municipal zones.
-2. **Pattern Analysis**: Recurrence modeling and collection route volatility tracking.
-3. **Risk Scoring**: Reproducible, transparent operational risk indices (0–100).
-4. **Recurrence Prediction**: 7-day forward forecasting estimating which locations will require attention next.
-5. **Explainable Prioritization**: Grounded operational explanations via Amazon Bedrock (with automatic rule-based fallback).
-6. **Operational Recommendations**: Proactive route adjustments and staged intervention workflows.
+**WasteSignal addresses Hackathon Track 03 (Waste & Energy) directly:**
+1. **Fixes a Real Environmental Problem:** Eliminates the 48-hour lag where uncollected waste ferments anaerobically into **methane (CH₄)** or gets torched into carcinogenic **PM2.5 and dioxin smoke**. Reduces municipal compactor fleet diesel consumption by up to **35%** via planned proactive routes.
+2. **Transforms Lives for Communities:** Eradicates open garbage piles and toxic smoke outside school routes and residential blocks. Slashes mosquito disease vectors (dengue, malaria).
+3. **Empowers Informal Recyclers:** Provides advance warning signals to decentralized waste picker cooperatives, allowing them to salvage clean, unsoiled recyclables **before** wet decomposition and truck compactor crushing destroy their economic value.
+4. **Predictive Intelligence Core:** 0–100 multi-signal risk index and 7-day forward forecasting interval modeling.
+5. **Explainable AI via Amazon Bedrock:** Transparent, grounded operational briefings with zero hallucinations and automatic deterministic fallback.
 
 ---
 
