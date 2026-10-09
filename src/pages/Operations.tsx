@@ -6,7 +6,7 @@ import './Operations.css';
 type OpTab = 'collection' | 'incidents' | 'interventions';
 
 export default function Operations() {
-  const { dataMode, sourceLabel, collectionActivity, incidents, interventions } = useWasteData();
+  const { dataMode, sourceLabel, collectionActivity, incidents, interventions, updateInterventionStatus } = useWasteData();
   const [activeTab, setActiveTab] = useState<OpTab>('collection');
   const [incidentFilter, setIncidentFilter] = useState('ALL');
   const chartRef = useRef<HTMLCanvasElement>(null);
@@ -224,24 +224,79 @@ export default function Operations() {
             </div>
           ) : (
             <div className="card" style={{ padding: 0 }}>
+              <div style={{ padding: 'var(--space-md) var(--space-lg)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 className="heading-subsection" style={{ margin: 0 }}>Operational Action Dispatch & Feedback Loop</h3>
+                  <span className="text-meta" style={{ marginTop: '2px' }}>
+                    TRACKING PREVENTIVE INTERVENTIONS DERIVED FROM PREDICTIVE SIGNALS
+                  </span>
+                </div>
+                <span className="text-meta">{interventions.length} TOTAL STAGED</span>
+              </div>
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Zone</th>
-                    <th>Intervention Type</th>
                     <th>Priority</th>
+                    <th>Location / Zone</th>
+                    <th>Reason</th>
+                    <th>Suggested Intervention</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {interventions.map(int => (
                     <tr key={int.id}>
-                      <td><span className="text-mono">{int.id}</span></td>
-                      <td><span className="text-mono">{int.zone}</span></td>
-                      <td>{int.type.replace(/_/g, ' ')}</td>
-                      <td><span className={`badge badge-${(int.priority || 'MODERATE').toLowerCase()}`}>{int.priority || 'STANDARD'}</span></td>
-                      <td><span className="text-small">{int.status}</span></td>
+                      <td>
+                        <span className={`badge badge-${(int.priority || 'MODERATE').toLowerCase()}`}>
+                          {int.priority || 'STANDARD'}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontWeight: 600 }}>{int.zone}</span>
+                          <span className="text-meta" style={{ fontSize: '10px' }}>{int.id}</span>
+                        </div>
+                      </td>
+                      <td style={{ maxWidth: '280px' }}>
+                        <span className="text-small text-secondary">
+                          {int.reason || int.description}
+                        </span>
+                      </td>
+                      <td style={{ maxWidth: '300px' }}>
+                        <span className="text-small" style={{ fontWeight: 500 }}>
+                          {int.suggestedIntervention || int.description}
+                        </span>
+                      </td>
+                      <td>
+                        <select
+                          className="select"
+                          style={{
+                            fontSize: '11px',
+                            padding: '4px 8px',
+                            fontWeight: 600,
+                            background:
+                              int.status === 'RESOLVED'
+                                ? 'rgba(122, 128, 97, 0.12)'
+                                : int.status === 'IN PROGRESS'
+                                ? 'rgba(212, 132, 90, 0.12)'
+                                : 'var(--bg-elevated)',
+                            color:
+                              int.status === 'RESOLVED'
+                                ? '#555c3c'
+                                : int.status === 'IN PROGRESS'
+                                ? '#a45025'
+                                : 'var(--text-primary)',
+                          }}
+                          value={int.status}
+                          onChange={e => updateInterventionStatus(int.id, e.target.value as any)}
+                        >
+                          <option value="PENDING">PENDING</option>
+                          <option value="REVIEW">REVIEW</option>
+                          <option value="ASSIGNED">ASSIGNED</option>
+                          <option value="IN PROGRESS">IN PROGRESS</option>
+                          <option value="RESOLVED">RESOLVED</option>
+                        </select>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

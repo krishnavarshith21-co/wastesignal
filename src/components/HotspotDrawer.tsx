@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useWasteData } from '../data/DataContext';
-import type { Hotspot } from '../types';
+import type { Hotspot, BedrockExplanationResponse } from '../types';
 import './HotspotDrawer.css';
 
 interface HotspotDrawerProps {
@@ -23,7 +24,38 @@ function signalStrengthBar(strength: string) {
 }
 
 export default function HotspotDrawer({ hotspot, open, onClose }: HotspotDrawerProps) {
-  const { sourceLabel, dataMode, datasetMeta } = useWasteData();
+  const { sourceLabel, dataMode, datasetMeta, explainHotspot } = useWasteData();
+  const [explanation, setExplanation] = useState<BedrockExplanationResponse | null>(null);
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [explainError, setExplainError] = useState<string | null>(null);
+
+  // Automatically fetch explanation when a hotspot is selected
+  useEffect(() => {
+    if (!hotspot || !open) {
+      setExplanation(null);
+      setExplainError(null);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsExplaining(true);
+    setExplainError(null);
+
+    explainHotspot(hotspot.id, hotspot.zone)
+      .then(res => {
+        if (isCurrent) setExplanation(res);
+      })
+      .catch(err => {
+        if (isCurrent) setExplainError(err.message);
+      })
+      .finally(() => {
+        if (isCurrent) setIsExplaining(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [hotspot, open, explainHotspot]);
 
   if (!hotspot) return null;
 
@@ -62,7 +94,7 @@ export default function HotspotDrawer({ hotspot, open, onClose }: HotspotDrawerP
                 }}
               />
             </div>
-            <span className="text-meta" style={{ marginTop: 6 }}>CALCULATED FROM AVAILABLE SIGNALS</span>
+            <span className="text-meta" style={{ marginTop: 6 }}>DETERMINISTIC MULTI-SIGNAL SCORING MODEL</span>
           </div>
 
           <hr className="divider" />
@@ -97,6 +129,86 @@ export default function HotspotDrawer({ hotspot, open, onClose }: HotspotDrawerP
 
           <hr className="divider" />
 
+          {/* Bedrock Grounded Explanation Section */}
+          <div className="drawer-section" style={{ background: 'var(--bg-elevated)', padding: '16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span className="text-meta" style={{ fontWeight: 600 }}>OPERATIONAL INTELLIGENCE & EXPLANATION</span>
+              {explanation?.aiProvider === 'AMAZON_BEDROCK' ? (
+                <span className="badge-connected" style={{ fontSize: '9px' }}>AMAZON BEDROCK</span>
+              ) : (
+                <span className="badge-ready" style={{ fontSize: '9px' }}>RULE-BASED EXPLANATION</span>
+              )}
+            </div>
+
+            {isExplaining && (
+              <div style={{ padding: '12px 0', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
+                Querying AWS explanation engine...
+              </div>
+            )}
+
+            {explainError && (
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--terracotta)', marginBottom: '8px' }}>
+                {explainError}
+              </div>
+            )}
+
+            {explanation && !isExplaining && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* 1. WHY IS THIS A HOTSPOT? */}
+                <div>
+                  <span className="text-meta" style={{ fontSize: '10px', color: 'var(--terracotta)' }}>WHY IS THIS A HOTSPOT?</span>
+                  <p className="text-body" style={{ marginTop: '4px', fontSize: 'var(--text-sm)', lineHeight: '1.5' }}>
+                    {explanation.whyPrioritized}
+                  </p>
+                </div>
+
+                {/* 2. WHAT SIGNALS CONTRIBUTED? */}
+                {explanation.contributingSignalsSummary.length > 0 && (
+                  <div>
+                    <span className="text-meta" style={{ fontSize: '10px' }}>WHAT SIGNALS CONTRIBUTED?</span>
+                    <ul style={{ margin: '4px 0 0 16px', padding: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                      {explanation.contributingSignalsSummary.map((sig, idx) => (
+                        <li key={idx} style={{ marginBottom: '3px' }}>{sig}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 3. WHAT SHOULD THE OPERATOR DO? */}
+                <div>
+                  <span className="text-meta" style={{ fontSize: '10px', color: 'var(--olive)' }}>WHAT SHOULD THE OPERATOR DO?</span>
+                  <p className="text-body" style={{ marginTop: '4px', fontSize: 'var(--text-sm)', fontWeight: 500 }}>
+                    {explanation.recommendedAction}
+                  </p>
+                </div>
+
+                {/* Preventive Checklist */}
+                {explanation.preventiveChecklist.length > 0 && (
+                  <div>
+                    <span className="text-meta" style={{ fontSize: '10px' }}>PREVENTIVE ACTION CHECKLIST</span>
+                    <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {explanation.preventiveChecklist.map((step, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                          <span style={{ color: 'var(--olive)', fontWeight: 'bold' }}>✓</span>
+                          <span>{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Provider Note */}
+                <div style={{ marginTop: '4px', paddingTop: '6px', borderTop: '1px solid var(--border-subtle)', fontSize: '10px', color: 'var(--text-tertiary)' }}>
+                  {explanation.aiProvider === 'AMAZON_BEDROCK'
+                    ? `Generated by Amazon Bedrock (${explanation.modelId || 'Foundation Model'}) strictly grounded in structured telemetry.`
+                    : `${explanation.fallbackReason || 'AI explanation unavailable. Showing rule-based explanation.'}`}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <hr className="divider" />
+
           {/* Available Signals */}
           <div className="drawer-section">
             <h3 className="heading-subsection">Available signals</h3>
@@ -112,14 +224,6 @@ export default function HotspotDrawer({ hotspot, open, onClose }: HotspotDrawerP
                 </div>
               ))}
             </div>
-          </div>
-
-          <hr className="divider" />
-
-          {/* Recommended Action */}
-          <div className="drawer-section">
-            <h3 className="heading-subsection">Recommended action</h3>
-            <p className="text-body" style={{ marginTop: 8 }}>{hotspot.recommendedAction}</p>
           </div>
 
           <hr className="divider" />

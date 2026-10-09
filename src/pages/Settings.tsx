@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWasteData } from '../data/DataContext';
+import AwsStatusCard from '../components/AwsStatusCard';
 import './Settings.css';
 
 export default function Settings() {
@@ -114,6 +115,11 @@ export default function Settings() {
               <span className="text-small text-tertiary">Client-side analytical engine</span>
             </div>
           </div>
+        </div>
+
+        {/* AWS Infrastructure Live Probing */}
+        <div className="full-width" style={{ gridColumn: '1 / -1' }}>
+          <AwsStatusCard />
         </div>
 
         {/* Signal Weight Calibration */}

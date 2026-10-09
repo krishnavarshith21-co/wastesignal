@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useWasteData } from '../data/DataContext';
 import EmptyState from '../components/EmptyState';
+import AwsStatusCard from '../components/AwsStatusCard';
 import { parseCSV, parseJSON } from '../data/analysisEngine';
 import type { WasteRecord } from '../types';
 import './DataSources.css';
@@ -41,6 +42,11 @@ export default function DataSources() {
   const [stagedColumns, setStagedColumns] = useState<string[]>([]);
   const [stagedValidation, setStagedValidation] = useState<{ valid: number; invalid: number } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Athena workbench state
+  const [athenaQueryType, setAthenaQueryType] = useState<string | null>(null);
+  const [athenaLoading, setAthenaLoading] = useState(false);
+  const [athenaResults, setAthenaResults] = useState<{ queryExecutionId?: string; rows?: any[]; error?: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -88,23 +94,49 @@ export default function DataSources() {
     }
   }
 
-  function handleConfirmIngestion() {
+  async function handleConfirmIngestion() {
     if (!uploadText.trim()) return;
     setIsProcessing(true);
 
-    setTimeout(() => {
-      const result = uploadData(uploadText, uploadFormat, uploadFileName || `dataset-${Date.now()}.${uploadFormat}`);
+    try {
+      const result = await uploadData(uploadText, uploadFormat, uploadFileName || `dataset-${Date.now()}.${uploadFormat}`);
       setIsProcessing(false);
       setShowUploadModal(false);
       setUploadText('');
       setStagedRecords([]);
       setStagedValidation(null);
 
-      if (result.success) {
-        setNotification(result.message);
-        setTimeout(() => setNotification(null), 4000);
+      setNotification(result.message);
+      setTimeout(() => setNotification(null), 4000);
+    } catch (err: any) {
+      setIsProcessing(false);
+      setNotification(err.message || 'Upload failed');
+      setTimeout(() => setNotification(null), 4000);
+    }
+  }
+
+  async function runAthenaQuery(queryType: string) {
+    setAthenaQueryType(queryType);
+    setAthenaLoading(true);
+    setAthenaResults(null);
+
+    try {
+      const res = await fetch('/api/aws/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ queryType }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAthenaResults({ queryExecutionId: data.queryExecutionId, rows: data.rows });
+      } else {
+        setAthenaResults({ error: data.error || data.details || 'Athena query execution failed' });
       }
-    }, 600);
+    } catch (err: any) {
+      setAthenaResults({ error: err.message || 'Athena query network error' });
+    } finally {
+      setAthenaLoading(false);
+    }
   }
 
   function handleDownloadSample() {
@@ -399,6 +431,99 @@ export default function DataSources() {
           />
         </div>
       )}
+
+      {/* Amazon Athena Analytical Workbench */}
+      <div className="card" style={{ marginTop: 'var(--space-xl)' }}>
+        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <span className="text-meta">SERVERLESS ANALYTICS LAYER</span>
+            <h3 className="heading-section" style={{ marginTop: '2px' }}>Amazon Athena Analytics Workbench</h3>
+            <p className="text-small text-secondary" style={{ marginTop: '4px' }}>
+              Execute live ANSI SQL queries against S3 operational telemetry cataloged via AWS Glue.
+            </p>
+          </div>
+          <div className="btn-group">
+            <button
+              className={`btn-secondary ${athenaLoading && athenaQueryType === 'hotspot-frequency' ? 'btn-loading' : ''}`}
+              onClick={() => runAthenaQuery('hotspot-frequency')}
+              disabled={athenaLoading}
+            >
+              Hotspot Frequency
+            </button>
+            <button
+              className={`btn-secondary ${athenaLoading && athenaQueryType === 'collection-performance' ? 'btn-loading' : ''}`}
+              onClick={() => runAthenaQuery('collection-performance')}
+              disabled={athenaLoading}
+            >
+              Collection Performance
+            </button>
+            <button
+              className={`btn-secondary ${athenaLoading && athenaQueryType === 'day-of-week' ? 'btn-loading' : ''}`}
+              onClick={() => runAthenaQuery('day-of-week')}
+              disabled={athenaLoading}
+            >
+              Day-of-Week Patterns
+            </button>
+          </div>
+        </div>
+
+        {athenaLoading && (
+          <div style={{ padding: 'var(--space-xl)', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <span className="text-small">Executing Amazon Athena query in ap-southeast-2 (workgroup: primary)...</span>
+          </div>
+        )}
+
+        {athenaResults?.error && (
+          <div style={{ padding: 'var(--space-md) var(--space-lg)', margin: 'var(--space-md)', background: 'rgba(198, 93, 58, 0.08)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(198, 93, 58, 0.2)' }}>
+            <span className="text-small" style={{ color: 'var(--terracotta)', fontWeight: 500 }}>
+              {athenaResults.error}
+            </span>
+          </div>
+        )}
+
+        {athenaResults?.rows && athenaResults.rows.length > 0 && (
+          <div style={{ padding: '0 var(--space-lg) var(--space-lg)' }}>
+            <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+              <span className="text-meta" style={{ fontSize: '10px' }}>
+                QUERY EXECUTION ID: <code className="text-mono">{athenaResults.queryExecutionId}</code>
+              </span>
+              <span className="text-meta" style={{ fontSize: '10px' }}>
+                {athenaResults.rows.length} ROWS RETURNED FROM S3 / GLUE
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+              <table className="data-table" style={{ fontSize: '11px', margin: 0 }}>
+                <thead>
+                  <tr>
+                    {Object.keys(athenaResults.rows[0]).map(col => (
+                      <th key={col}>{col.replace(/_/g, ' ')}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {athenaResults.rows.map((row, rIdx) => (
+                    <tr key={rIdx}>
+                      {Object.values(row).map((val: any, cIdx) => (
+                        <td key={cIdx} className="text-mono">{String(val)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {athenaResults?.rows && athenaResults.rows.length === 0 && (
+          <div style={{ padding: 'var(--space-lg)', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+            <span className="text-small">Query succeeded with 0 rows. Ingest data to query S3 partitions.</span>
+          </div>
+        )}
+      </div>
+
+      {/* Real AWS Data & AI Infrastructure Status */}
+      <AwsStatusCard />
+
 
       {/* Upload Modal (CSV / JSON / Demo) */}
       {showUploadModal && (

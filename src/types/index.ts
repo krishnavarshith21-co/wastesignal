@@ -132,15 +132,20 @@ export interface Incident {
 }
 
 // ─── Intervention (computed) ─────────────────────────────────
+export type InterventionStatus = 'PENDING' | 'REVIEW' | 'ASSIGNED' | 'IN PROGRESS' | 'RESOLVED' | 'ACTIVE';
+
 export interface Intervention {
   id: string;
   zone: string;
   type: string;
   priority?: Priority;
-  status: 'PENDING' | 'ACTIVE' | 'RESOLVED';
+  status: InterventionStatus;
   assignedDate: string;
   resolvedDate?: string;
   description: string;
+  reason?: string;
+  suggestedIntervention?: string;
+  assignedTo?: string;
 }
 
 // ─── Intelligence Insight (computed from dataset) ────────────
@@ -180,3 +185,41 @@ export interface ReportConfig {
   predictionAvailable: boolean;
   limitations: string[];
 }
+
+// ─── AWS Infrastructure Types ────────────────────────────────
+export interface AwsServiceProbe {
+  status: 'CONNECTED' | 'NOT CONFIGURED' | 'UNAVAILABLE' | 'ERROR' | 'READY';
+  bucket?: string;
+  database?: string;
+  workgroup?: string;
+  modelId?: string;
+  endpointName?: string;
+  handler?: string;
+  environment?: string;
+  error?: string;
+}
+
+export interface AwsInfrastructureStatus {
+  timestamp: string;
+  region: string;
+  services: {
+    s3: AwsServiceProbe;
+    glue: AwsServiceProbe;
+    athena: AwsServiceProbe;
+    bedrock: AwsServiceProbe;
+    sagemaker: AwsServiceProbe;
+    lambda: AwsServiceProbe;
+  };
+  overallStatus: 'OPERATIONAL' | 'DEGRADED' | 'CONFIG_REQUIRED';
+}
+
+export interface BedrockExplanationResponse {
+  whyPrioritized: string;
+  contributingSignalsSummary: string[];
+  recommendedAction: string;
+  preventiveChecklist: string[];
+  aiProvider: 'AMAZON_BEDROCK' | 'RULE_BASED_FALLBACK';
+  modelId?: string;
+  fallbackReason?: string;
+}
+
