@@ -218,7 +218,8 @@ export interface BedrockExplanationResponse {
   contributingSignalsSummary: string[];
   recommendedAction: string;
   preventiveChecklist: string[];
-  aiProvider: 'AMAZON_BEDROCK' | 'RULE_BASED_FALLBACK';
+  uncertaintyOrMissingInfo?: string;
+  aiProvider: 'BEDROCK' | 'AMAZON_BEDROCK' | 'RULE_BASED_FALLBACK';
   modelId?: string;
   fallbackReason?: string;
 }

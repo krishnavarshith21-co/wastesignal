@@ -231,7 +231,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="landing-hero-desc">
-              WasteSignal predicts municipal waste overflow and illegal dumping cycles before they emit methane or get torched — transforming emergency cleanups into proactive, low-emission routes.
+              WasteSignal transforms multi-signal municipal operational telemetry into predictive risk scores and explainable action plans — replacing reactive cleanups with prioritized, proactive collection routes.
             </p>
 
             <div className="landing-hero-ctas">
@@ -318,7 +318,7 @@ export default function LandingPage() {
             Stopping waste disasters before they burn.
           </h2>
           <p className="landing-section-desc">
-            A small problem solved well beats a big one solved vaguely. WasteSignal targets the critical 48-hour window between municipal waste accumulation and toxic environmental hazard.
+            Operational bottlenecks in municipal waste fleets degrade neighborhoods, prompt open burning, and cause inefficient fleet routing. WasteSignal targets root operational causes.
           </p>
         </div>
 
@@ -326,32 +326,32 @@ export default function LandingPage() {
           {/* Pillar 1: Environmental Fix */}
           <div className="impact-card">
             <div className="impact-card-header">
-              <span className="impact-card-tag">THE ENVIRONMENTAL PROBLEM</span>
-              <span className="impact-status-pill pill-alert">CRITICAL HAZARD</span>
+              <span className="impact-card-tag">ENVIRONMENTAL CHALLENGE</span>
+              <span className="impact-status-pill pill-alert">FIELD HAZARDS</span>
             </div>
-            <h3 className="impact-card-title">Landfill Methane & Toxic Open-Air Trash Fires</h3>
+            <h3 className="impact-card-title">Stagnant Waste Dumps & Toxic Open Burning</h3>
             <p className="impact-card-text">
-              In urban centers, uncollected waste left over 48 hours ferments anaerobically, emitting potent <strong>methane (CH₄)</strong> and toxic leachate. Frustrated residents and illegal dumpers routinely torch stagnant trash heaps, releasing carcinogenic dioxins, furans, and heavy <strong>PM2.5 smoke</strong> across neighboring communities.
+              When collection routes experience chronic delays, stagnant waste accumulation generates pungent odors, toxic runoff, and prompts illegal open burning. Community trash fires release carcinogenic dioxins, furans, and heavy <strong>PM2.5 particulates</strong> directly into neighborhood air.
             </p>
             <div className="impact-card-solution">
-              <span className="solution-prefix">THE WASTESIGNAL FIX:</span>
-              <span>Predictive 7-day recurrence modeling directs municipal compactor routes 48 hours in advance, eradicating dump accumulation before fermentation and spontaneous combustion occur.</span>
+              <span className="solution-prefix">WASTESIGNAL INTERVENTION:</span>
+              <span>Predictive hotspot scoring identifies recurrent queue delays days in advance, allowing sanitation teams to dispatch capacity before piles accumulate and trigger open burning.</span>
             </div>
           </div>
 
           {/* Pillar 2: Human Outcome */}
           <div className="impact-card">
             <div className="impact-card-header">
-              <span className="impact-card-tag">WHAT CHANGES FOR PEOPLE</span>
-              <span className="impact-status-pill pill-success">HUMAN OUTCOME</span>
+              <span className="impact-card-tag">COMMUNITY OUTCOME</span>
+              <span className="impact-status-pill pill-success">PUBLIC HEALTH</span>
             </div>
-            <h3 className="impact-card-title">Clean School Routes, Disease Control & Dignified Sanitation</h3>
+            <h3 className="impact-card-title">Clean Living Corridors & Safer Field Operations</h3>
             <p className="impact-card-text">
-              Families living near chronic collection gaps endure noxious odors, groundwater contamination, and vector breeding grounds for dengue and malaria. Street workers suffer acute injury and respiratory disease handling decomposing, hazardous waste heaps.
+              Stagnant discarded containers collect rainwater, creating localized breeding habitats for disease vectors (WHO). Sanitation field crews face injury and exhaustion when dealing with decomposed emergency waste heaps instead of routine containerized collections.
             </p>
             <div className="impact-card-solution">
-              <span className="solution-prefix">THE WASTESIGNAL FIX:</span>
-              <span>Replaces reactive emergency cleanup scrambles with scheduled, daytime preventative loops — keeping residential streets clean, slashing mosquito vectors, and reducing worker overtime burnout.</span>
+              <span className="solution-prefix">WASTESIGNAL INTERVENTION:</span>
+              <span>Replaces emergency cleanup scrambles with scheduled, daytime preventive routing — keeping public corridors clear and reducing emergency worker overtime.</span>
             </div>
           </div>
 
@@ -359,15 +359,15 @@ export default function LandingPage() {
           <div className="impact-card">
             <div className="impact-card-header">
               <span className="impact-card-tag">CIRCULAR RECOVERY</span>
-              <span className="impact-status-pill pill-info">ENERGY & RECYCLING</span>
+              <span className="impact-status-pill pill-info">MATERIAL RECOVERY</span>
             </div>
-            <h3 className="impact-card-title">Empowering Informal Recyclers Before Contamination</h3>
+            <h3 className="impact-card-title">Preventing Recyclable Contamination Before Landfilling</h3>
             <p className="impact-card-text">
-              Over 80% of municipal plastic and dry recyclables are collected by informal waste pickers. Once mixed with decomposing wet organic matter and compressed in hydraulic trucks, valuable cardboard and plastics become soiled and unrecyclable.
+              In many developing municipalities, the informal sector recovers 50–80% of post-consumer recyclables (UN-Habitat / World Bank). When dry cardboard and plastics remain co-mingled in wet decomposing heaps, they become soiled and lost to landfills.
             </p>
             <div className="impact-card-solution">
-              <span className="solution-prefix">THE WASTESIGNAL FIX:</span>
-              <span>Early volume warning signals alert decentralized recycling collectives to salvage segregated dry materials at source before wet contamination destroys their circular economic value.</span>
+              <span className="solution-prefix">WASTESIGNAL INTERVENTION:</span>
+              <span>Volume surge alerts provide early indicators to municipal operators and recycling collectives to prioritize segregated recovery before compaction contamination.</span>
             </div>
           </div>
         </div>
@@ -376,22 +376,22 @@ export default function LandingPage() {
         <div className="impact-metrics-ribbon">
           <div className="impact-ribbon-item">
             <span className="ribbon-val">~18.4 T</span>
-            <span className="ribbon-lbl">CO₂e & Toxic Smoke Prevented / Sector / Yr</span>
+            <span className="ribbon-lbl">Est. CO₂e Avoided / Sector (Pilot Simulation)</span>
           </div>
           <div className="impact-ribbon-sep" />
           <div className="impact-ribbon-item">
-            <span className="ribbon-val">-35%</span>
-            <span className="ribbon-lbl">Collection Truck Diesel Consumption</span>
+            <span className="ribbon-val">15–35%</span>
+            <span className="ribbon-lbl">Literature Fleet Route Optimization Potential</span>
           </div>
           <div className="impact-ribbon-sep" />
           <div className="impact-ribbon-item">
-            <span className="ribbon-val">60%</span>
-            <span className="ribbon-lbl">Faster Hazard Resolution Before Escalation</span>
+            <span className="ribbon-val">~60%</span>
+            <span className="ribbon-lbl">Targeted Escalation Latency Reduction</span>
           </div>
           <div className="impact-ribbon-sep" />
           <div className="impact-ribbon-item">
             <span className="ribbon-val">100%</span>
-            <span className="ribbon-lbl">AWS Serverless Traceability (ap-southeast-2)</span>
+            <span className="ribbon-lbl">AWS Regional Architecture (ap-southeast-2)</span>
           </div>
         </div>
       </section>

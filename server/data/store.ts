@@ -2,6 +2,7 @@ import type { ValidatedWasteRecord, DatasetValidationResult } from '../engine/sc
 import type { ComputedHotspotItem } from '../engine/hotspotEngine';
 import type { ForwardPredictionItem } from '../engine/predictionEngine';
 import type { OperationalIntervention } from '../engine/operationsEngine';
+import { buildCanonicalDemoState } from './demoSeed';
 
 export interface ActiveDatasetState {
   datasetId: string;
@@ -21,7 +22,10 @@ export interface ActiveDatasetState {
 class DataStore {
   private activeState: ActiveDatasetState | null = null;
 
-  getActive(): ActiveDatasetState | null {
+  getActive(autoInitialize = true): ActiveDatasetState | null {
+    if (!this.activeState && autoInitialize) {
+      this.activeState = buildCanonicalDemoState();
+    }
     return this.activeState;
   }
 

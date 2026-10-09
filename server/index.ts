@@ -10,7 +10,29 @@ import { awsRouter } from './routes/aws';
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  'https://wastesignal.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    if (process.env.NODE_ENV !== 'production' || process.env.CORS_ALLOW_ALL === 'true') {
+      return callback(null, true);
+    }
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: true,
+}));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -55,10 +77,10 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-// Start server if executed directly
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(config.port, () => {
-    console.log(`[WasteSignal Server] Listening on http://localhost:${config.port}`);
+// Start server if executed directly in standalone mode (not in Lambda or test)
+if (process.env.NODE_ENV !== 'test' && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  app.listen(config.port, '0.0.0.0', () => {
+    console.log(`[WasteSignal Server] Listening on http://0.0.0.0:${config.port}`);
     console.log(`[WasteSignal AWS Region] ${config.aws.region}`);
     console.log(`[WasteSignal S3 Bucket] ${config.aws.s3Bucket}`);
   });

@@ -9,6 +9,7 @@ export default function Operations() {
   const { dataMode, sourceLabel, collectionActivity, incidents, interventions, updateInterventionStatus } = useWasteData();
   const [activeTab, setActiveTab] = useState<OpTab>('collection');
   const [incidentFilter, setIncidentFilter] = useState('ALL');
+  const [transitionError, setTransitionError] = useState<string | null>(null);
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [chartW, setChartW] = useState(600);
@@ -233,6 +234,28 @@ export default function Operations() {
                 </div>
                 <span className="text-meta">{interventions.length} TOTAL STAGED</span>
               </div>
+              {transitionError && (
+                <div style={{
+                  margin: '0 0 16px 0',
+                  padding: '10px 14px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(198, 93, 58, 0.12)',
+                  border: '1px solid var(--accent-terra)',
+                  color: 'var(--accent-terra)',
+                  fontSize: '12px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                  <span>⚠️ <strong>State Machine Notice:</strong> {transitionError}</span>
+                  <button
+                    onClick={() => setTransitionError(null)}
+                    style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
               <table className="data-table">
                 <thead>
                   <tr>
@@ -288,7 +311,14 @@ export default function Operations() {
                                 : 'var(--text-primary)',
                           }}
                           value={int.status}
-                          onChange={e => updateInterventionStatus(int.id, e.target.value as any)}
+                          onChange={async e => {
+                            setTransitionError(null);
+                            try {
+                              await updateInterventionStatus(int.id, e.target.value as any);
+                            } catch (err: any) {
+                              setTransitionError(err.message || 'Failed to update intervention state');
+                            }
+                          }}
                         >
                           <option value="PENDING">PENDING</option>
                           <option value="REVIEW">REVIEW</option>

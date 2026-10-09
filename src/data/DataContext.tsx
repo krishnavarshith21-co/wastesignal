@@ -21,8 +21,9 @@ import { DEMO_WASTE_DATA, DEMO_DATASET_META } from '../data/demoWasteData';
 import {
   analyzeHotspots, analyzePredictions, analyzeCollectionActivity,
   analyzeIncidents, analyzeInterventions, analyzeIntelligence,
-  analyzeDataAvailability, parseCSV, parseJSON, hasCoordinates,
+  analyzeDataAvailability, hasCoordinates,
 } from '../data/analysisEngine';
+import { apiFetch } from '../utils/api';
 
 interface DataContextType {
   // Mode
@@ -71,13 +72,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const refreshAwsStatus = useCallback(async () => {
     try {
       setAwsStatusLoading(true);
-      const res = await fetch('/api/aws/status');
-      if (res.ok) {
-        const data: AwsInfrastructureStatus = await res.json();
-        setAwsStatus(data);
-      }
-    } catch (err) {
-      console.warn('Unable to reach /api/aws/status:', err);
+      const data = await apiFetch<AwsInfrastructureStatus>('/api/aws/status');
+      setAwsStatus(data);
+    } catch (err: any) {
+      console.warn('Unable to reach /api/aws/status:', err.message);
     } finally {
       setAwsStatusLoading(false);
     }
@@ -180,64 +178,61 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const loadDemoData = useCallback(async () => {
     try {
-      const res = await fetch('/api/datasets/demo', { method: 'POST' });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.dataset) {
-          const mapped: WasteRecord[] = (data.validation?.records || []).map((r: any) => ({
-            zone_id: r.zone_id,
-            zone_name: r.location_name,
-            timestamp: r.timestamp,
-            incident_type: r.incident_type,
-            incident_status: r.incident_status,
-            collection_status: r.collection_status,
-            collection_delay: r.collection_delay,
-            latitude: r.latitude,
-            longitude: r.longitude,
-            waste_type: r.waste_type,
-            volume: r.reported_volume,
-          }));
+      const data = await apiFetch<any>('/api/datasets/demo', { method: 'POST' });
+      if (data.success && data.dataset) {
+        const mapped: WasteRecord[] = (data.validation?.records || []).map((r: any) => ({
+          zone_id: r.zone_id,
+          zone_name: r.location_name,
+          timestamp: r.timestamp,
+          incident_type: r.incident_type,
+          incident_status: r.incident_status,
+          collection_status: r.collection_status,
+          collection_delay: r.collection_delay,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          waste_type: r.waste_type,
+          volume: r.reported_volume,
+        }));
 
-          setRawData(mapped.length > 0 ? mapped : DEMO_WASTE_DATA);
-          setDatasetMeta({
-            id: data.dataset.id,
-            name: data.dataset.name,
-            fileName: data.dataset.fileName,
-            importedAt: new Date().toISOString(),
-            totalRecords: data.validation?.totalRecords || mapped.length,
-            validRecords: data.validation?.validRecords || mapped.length,
-            invalidRecords: data.validation?.invalidRecords || 0,
-            detectedColumns: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
-            availableFields: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
-            missingFields: [],
-            status: 'VALIDATED',
-            isDemo: true,
-          });
+        setRawData(mapped.length > 0 ? mapped : DEMO_WASTE_DATA);
+        setDatasetMeta({
+          id: data.dataset.id,
+          name: data.dataset.name,
+          fileName: data.dataset.fileName,
+          importedAt: new Date().toISOString(),
+          totalRecords: data.validation?.totalRecords || mapped.length,
+          validRecords: data.validation?.validRecords || mapped.length,
+          invalidRecords: data.validation?.invalidRecords || 0,
+          detectedColumns: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
+          availableFields: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
+          missingFields: [],
+          status: 'VALIDATED',
+          isDemo: true,
+        });
 
-          if (data.interventions && Array.isArray(data.interventions)) {
-            setBackendInterventions(
-              data.interventions.map((it: any) => ({
-                id: it.id,
-                zone: it.zoneId,
-                type: 'PREVENTIVE DISPATCH',
-                priority: it.priority,
-                status: it.status,
-                assignedDate: it.createdAt,
-                description: it.suggestedIntervention || it.reason,
-                reason: it.reason,
-                suggestedIntervention: it.suggestedIntervention,
-                assignedTo: it.assignedTo,
-              }))
-            );
-          }
-
-          setDataMode('DEMO');
-          refreshAwsStatus();
-          return;
+        if (data.interventions && Array.isArray(data.interventions)) {
+          setBackendInterventions(
+            data.interventions.map((it: any) => ({
+              id: it.id,
+              zone: it.zoneId,
+              type: 'PREVENTIVE DISPATCH',
+              priority: it.priority,
+              status: it.status,
+              assignedDate: it.createdAt,
+              description: it.suggestedIntervention || it.reason,
+              reason: it.reason,
+              suggestedIntervention: it.suggestedIntervention,
+              assignedTo: it.assignedTo,
+            }))
+          );
         }
+
+        setDataMode('DEMO');
+        refreshAwsStatus();
+        return;
       }
-    } catch (err) {
-      console.warn('Backend unavailable during loadDemoData, falling back to local data:', err);
+    } catch (err: any) {
+      console.warn('Backend unavailable during loadDemoData, falling back to local synthetic demonstration data:', err.message);
     }
 
     // Client-side fallback if backend is offline
@@ -246,109 +241,79 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setDataMode('DEMO');
   }, [refreshAwsStatus]);
 
-  const uploadData = useCallback(async (text: string, format: 'csv' | 'json', fileName: string): Promise<{ success: boolean; message: string }> => {
+  const uploadData = useCallback(async (text: string, _format: 'csv' | 'json', fileName: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const res = await fetch('/api/datasets/upload', {
+      const data = await apiFetch<any>('/api/datasets/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: text, fileName }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.dataset) {
-          const mapped: WasteRecord[] = (data.validation?.records || []).map((r: any) => ({
-            zone_id: r.zone_id,
-            zone_name: r.location_name,
-            timestamp: r.timestamp,
-            incident_type: r.incident_type,
-            incident_status: r.incident_status,
-            collection_status: r.collection_status,
-            collection_delay: r.collection_delay,
-            latitude: r.latitude,
-            longitude: r.longitude,
-            waste_type: r.waste_type,
-            volume: r.reported_volume,
-          }));
+      if (data.success && data.dataset) {
+        const mapped: WasteRecord[] = (data.validation?.records || []).map((r: any) => ({
+          zone_id: r.zone_id,
+          zone_name: r.location_name,
+          timestamp: r.timestamp,
+          incident_type: r.incident_type,
+          incident_status: r.incident_status,
+          collection_status: r.collection_status,
+          collection_delay: r.collection_delay,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          waste_type: r.waste_type,
+          volume: r.reported_volume,
+        }));
 
-          setRawData(mapped);
-          setDatasetMeta({
-            id: data.dataset.id,
-            name: data.dataset.name,
-            fileName: data.dataset.fileName,
-            importedAt: new Date().toISOString(),
-            totalRecords: data.validation?.totalRecords || mapped.length,
-            validRecords: data.validation?.validRecords || mapped.length,
-            invalidRecords: data.validation?.invalidRecords || 0,
-            detectedColumns: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
-            availableFields: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
-            missingFields: [],
-            status: data.validation?.invalidRecords > 0 ? 'WARNING' : 'VALIDATED',
-            isDemo: false,
-          });
+        setRawData(mapped);
+        setDatasetMeta({
+          id: data.dataset.id,
+          name: data.dataset.name,
+          fileName: data.dataset.fileName,
+          importedAt: new Date().toISOString(),
+          totalRecords: data.validation?.totalRecords || mapped.length,
+          validRecords: data.validation?.validRecords || mapped.length,
+          invalidRecords: data.validation?.invalidRecords || 0,
+          detectedColumns: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
+          availableFields: ['record_id', 'timestamp', 'latitude', 'longitude', 'location_name', 'zone_id', 'waste_type', 'incident_type', 'collection_status', 'collection_delay', 'reported_volume'],
+          missingFields: [],
+          status: data.validation?.invalidRecords > 0 ? 'WARNING' : 'VALIDATED',
+          isDemo: false,
+        });
 
-          if (data.interventions && Array.isArray(data.interventions)) {
-            setBackendInterventions(
-              data.interventions.map((it: any) => ({
-                id: it.id,
-                zone: it.zoneId,
-                type: 'PREVENTIVE DISPATCH',
-                priority: it.priority,
-                status: it.status,
-                assignedDate: it.createdAt,
-                description: it.suggestedIntervention || it.reason,
-                reason: it.reason,
-                suggestedIntervention: it.suggestedIntervention,
-                assignedTo: it.assignedTo,
-              }))
-            );
-          }
-
-          setDataMode('LIVE');
-          refreshAwsStatus();
-          return {
-            success: true,
-            message: `Successfully processed ${data.validation?.validRecords || mapped.length} records into S3 and Glue catalog.`,
-          };
-        } else {
-          return {
-            success: false,
-            message: data.error || 'Failed to upload dataset to AWS storage.',
-          };
+        if (data.interventions && Array.isArray(data.interventions)) {
+          setBackendInterventions(
+            data.interventions.map((it: any) => ({
+              id: it.id,
+              zone: it.zoneId,
+              type: 'PREVENTIVE DISPATCH',
+              priority: it.priority,
+              status: it.status,
+              assignedDate: it.createdAt,
+              description: it.suggestedIntervention || it.reason,
+              reason: it.reason,
+              suggestedIntervention: it.suggestedIntervention,
+              assignedTo: it.assignedTo,
+            }))
+          );
         }
+
+        setDataMode('LIVE');
+        refreshAwsStatus();
+        return {
+          success: true,
+          message: `Successfully processed ${data.validation?.validRecords || mapped.length} records into S3 and Glue catalog.`,
+        };
       } else {
-        const errorData = await res.json().catch(() => ({}));
         return {
           success: false,
-          message: errorData.error || `Upload rejected (${res.status}): ${res.statusText}`,
+          message: data.error || 'Failed to upload dataset to AWS storage.',
         };
       }
     } catch (err: any) {
-      console.warn('Backend upload failed, attempting local parse fallback:', err.message);
-      const records = format === 'csv' ? parseCSV(text) : parseJSON(text);
-      if (records.length === 0) {
-        return { success: false, message: 'No valid records could be parsed from the file.' };
-      }
-      const availability = analyzeDataAvailability(records);
-      setRawData(records);
-      setDatasetMeta({
-        id: `upload-${Date.now()}`,
-        name: fileName,
-        fileName,
-        importedAt: new Date().toISOString(),
-        totalRecords: records.length,
-        validRecords: records.filter(r => r.zone_id && r.timestamp).length,
-        invalidRecords: records.filter(r => !r.zone_id || !r.timestamp).length,
-        detectedColumns: availability.available,
-        availableFields: availability.available,
-        missingFields: availability.missing,
-        status: records.filter(r => !r.zone_id || !r.timestamp).length > 0 ? 'WARNING' : 'VALIDATED',
-        isDemo: false,
-      });
-      setDataMode('LIVE');
+      console.error('Backend upload to AWS failed:', err.message);
       return {
-        success: true,
-        message: `Parsed ${records.length} records locally (backend offline).`,
+        success: false,
+        message: `AWS Ingestion Failed: ${err.message}. Telemetry was NOT uploaded to Amazon S3 or registered in AWS Glue Data Catalog.`,
       };
     }
   }, [refreshAwsStatus]);
@@ -361,41 +326,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const explainHotspot = useCallback(async (hotspotId: string, zoneId?: string): Promise<BedrockExplanationResponse> => {
-    const res = await fetch('/api/intelligence/explain', {
+    const data = await apiFetch<{ explanation: BedrockExplanationResponse }>('/api/intelligence/explain', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hotspotId, zoneId }),
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `Failed to generate explanation (${res.status})`);
-    }
-
-    const data = await res.json();
     return data.explanation;
   }, []);
 
   const updateInterventionStatus = useCallback(async (id: string, status: InterventionStatus, notes?: string) => {
-    try {
-      const res = await fetch(`/api/operations/interventions/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, notes }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.intervention) {
-          setBackendInterventions(prev =>
-            prev.map(it => it.id === id ? { ...it, status: data.intervention.status, notes: data.intervention.notes } : it)
-          );
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to persist intervention update:', err);
-      // Local optimistic update
+    const data = await apiFetch<{ success: boolean; intervention: any }>(`/api/operations/interventions/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, notes }),
+    });
+
+    if (data.intervention) {
       setBackendInterventions(prev =>
-        prev.map(it => it.id === id ? { ...it, status } : it)
+        prev.map(it => it.id === id ? { ...it, status: data.intervention.status, notes: data.intervention.notes } : it)
       );
     }
   }, []);

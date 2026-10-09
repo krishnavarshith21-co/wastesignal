@@ -64,22 +64,40 @@ async function runE2E() {
       console.log('   Why Prioritized:', explainRes.explanation?.whyPrioritized);
       console.log('   Recommended Action:', explainRes.explanation?.recommendedAction);
 
-      // 8. Update Operational Intervention
-      console.log('8. Testing PATCH /api/operations/interventions/:id...');
+      // 8. Update Operational Intervention & Test State Machine Enforcement
+      console.log('8. Testing PATCH /api/operations/interventions/:id state machine lifecycle...');
       const opsBefore = await fetch('http://localhost:3098/api/operations').then(r => r.json());
       const firstInt = opsBefore.interventions[0];
-      console.log('   First intervention before:', firstInt.id, firstInt.status);
+      console.log('   First intervention initial status:', firstInt.id, firstInt.status);
 
+      // 8a. Valid transition: PENDING -> IN PROGRESS (or ASSIGNED)
       const updateRes = await fetch(`http://localhost:3098/api/operations/interventions/${firstInt.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'IN PROGRESS', notes: 'Dispatched compaction vehicle V-12' }),
       }).then(r => r.json());
-      console.log('   Update result status:', updateRes.intervention?.status);
+      console.log('   Valid transition to IN PROGRESS:', updateRes.intervention?.status);
+
+      // 8b. Prohibited transition: IN PROGRESS -> REVIEW (must be rejected with HTTP 400)
+      const invalidRes = await fetch(`http://localhost:3098/api/operations/interventions/${firstInt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'REVIEW' }),
+      });
+      const invalidJson = await invalidRes.json();
+      console.log('   Prohibited transition (IN PROGRESS -> REVIEW) rejected:', invalidRes.status === 400, `(${invalidJson.error})`);
+
+      // 8c. Valid transition: IN PROGRESS -> RESOLVED
+      const resolvedRes = await fetch(`http://localhost:3098/api/operations/interventions/${firstInt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'RESOLVED', notes: 'Site cleared and verified by sanitation lead' }),
+      }).then(r => r.json());
+      console.log('   Valid transition to RESOLVED:', resolvedRes.intervention?.status);
 
       const opsAfter = await fetch('http://localhost:3098/api/operations').then(r => r.json());
       const updatedInt = opsAfter.interventions.find((i: any) => i.id === firstInt.id);
-      console.log('   First intervention after update:', updatedInt.id, updatedInt.status, 'Notes:', updatedInt.notes);
+      console.log('   Persisted in store:', updatedInt.id, updatedInt.status, 'ResolvedAt:', updatedInt.resolvedAt ? 'Recorded' : 'Missing');
 
       console.log('--- ALL E2E ACCEPTANCE TESTS PASSED SUCCESSFULLY! ---');
     } catch (err) {

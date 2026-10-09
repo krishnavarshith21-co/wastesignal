@@ -56,10 +56,10 @@ WasteSignal connects to real AWS infrastructure in the selected region (`ap-sout
 
 | Service | Real Implementation | Status in Prototype |
 |---|---|---|
-| **Amazon S3** | Stores raw uploads, processed datasets, and 7-day predictions (`wastesignal-data-683023468572-ap-southeast-2`) | **CONNECTED** |
-| **AWS Glue** | Catalogs `operational_telemetry` table and manages schema in `wastesignal_db` | **CONNECTED** |
-| **Amazon Athena** | Executes ad-hoc SQL analytical queries on workgroup `primary` with staged S3 outputs | **CONNECTED** |
-| **Amazon Bedrock** | Generates grounded explanations using `amazon.nova-micro-v1:0` with transparent rule-based fallback | **CONNECTED** (with automatic rule fallback when model approval is pending) |
+| **Amazon S3** | Stores raw uploads, processed datasets, and 7-day predictions (`wastesignal-data-683023468572-ap-southeast-2`) | **CONNECTED** (Verified) |
+| **AWS Glue** | Catalogs `operational_telemetry` table and manages schema in `wastesignal_db` | **CONNECTED** (Verified) |
+| **Amazon Athena** | Executes ad-hoc SQL analytical queries on workgroup `primary` with staged S3 outputs | **CONNECTED** (Verified) |
+| **Amazon Bedrock** | Explanations configured with `amazon.nova-micro-v1:0` with transparent rule-based fallback | **UNAVAILABLE** *(Model access pending AWS Console activation; rule fallback active)* |
 | **Amazon SageMaker**| Clean prediction interface defined for production model deployment | **NOT CONFIGURED** *(Transparently reported)* |
 | **AWS Lambda** | Packaged in `server/lambda.ts` for serverless API Gateway deployment | **READY** |
 
@@ -143,6 +143,7 @@ SAGEMAKER_ENDPOINT_NAME=
 - Complete AWS Setup Guide: [`AWS_SETUP.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/AWS_SETUP.md)
 - Operational Telemetry Schema: [`docs/data-schema.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/data-schema.md)
 - Prediction & Scoring Methodology: [`docs/prediction-methodology.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/prediction-methodology.md)
+- Environmental Impact & Pilot Framework: [`docs/environmental-impact-methodology.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/environmental-impact-methodology.md)
 - Security Governance: [`docs/security.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/security.md)
 
 ---

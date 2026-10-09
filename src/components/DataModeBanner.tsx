@@ -35,7 +35,7 @@ export default function DataModeBanner() {
         <span className="hackathon-tag-mini">TRACK 03 • WASTE & ENERGY</span>
         <span className="data-mode-label">
           {dataMode === 'DEMO'
-            ? 'AWS DEMO DATASET — S3 BUCKET & GLUE CATALOG ACTIVE'
+            ? 'SYNTHETIC DEMONSTRATION DATA — S3 BUCKET & GLUE CATALOG ACTIVE'
             : 'CONNECTED — UPLOADED DATASET'}
         </span>
       </div>

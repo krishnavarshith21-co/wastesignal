@@ -18,6 +18,14 @@ export interface OperationalIntervention {
   notes?: string;
 }
 
+const VALID_TRANSITIONS: Record<InterventionStatus, InterventionStatus[]> = {
+  REVIEW: ['PENDING', 'ASSIGNED'],
+  PENDING: ['ASSIGNED', 'IN PROGRESS'],
+  ASSIGNED: ['IN PROGRESS', 'PENDING'],
+  'IN PROGRESS': ['RESOLVED', 'ASSIGNED'],
+  RESOLVED: ['IN PROGRESS'],
+};
+
 export class OperationsEngine {
   private interventions: Map<string, OperationalIntervention> = new Map();
 
@@ -78,8 +86,18 @@ export class OperationsEngine {
       throw new Error(`Intervention ${id} not found.`);
     }
 
+    // Validate state machine transition if status is being changed
+    if (status && status !== item.status) {
+      const allowed = VALID_TRANSITIONS[item.status] || [];
+      if (!allowed.includes(status)) {
+        throw new Error(
+          `Invalid state transition: Cannot change intervention from '${item.status}' to '${status}'. Permitted transitions are: ${allowed.join(', ') || 'None'}`
+        );
+      }
+    }
+
     const now = new Date().toISOString();
-    item.status = status;
+    if (status) item.status = status;
     item.updatedAt = now;
     if (assignedTo !== undefined) item.assignedTo = assignedTo;
     if (notes !== undefined) item.notes = notes;

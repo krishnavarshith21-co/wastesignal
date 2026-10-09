@@ -3,113 +3,135 @@
 > **Hackathon:** WeMakeDevs × AWS Environmental Hackathon  
 > **Track:** Track 03 — Waste and Energy  
 > **Target Video Duration:** Exactly 3:00 (180 seconds)  
-> **Format:** Screen recording with voiceover (No face required)
+> **Format:** Screen recording with voiceover (No face required)  
+> **AWS Region:** `ap-southeast-2` (Asia Pacific – Sydney)
 
 ---
 
-### [0:00 – 0:35] Part 1: The Problem & Track 03 Context
+### [0:00 – 0:25] Part 1: Problem and Target Users
 
 **Screen to show:**
 - Open `http://localhost:5173/` (Landing Page).
-- Slowly scroll down from the Hero section to the **"Track 03 • Environmental Impact"** grid.
+- Slowly scroll from Hero down to the **"Track 03 • Environmental Impact"** section.
 
 **Voiceover Script:**
 > *"Hi judges, welcome to WasteSignal. We built this for Track 03: Waste and Energy.*
 > 
-> *In modern cities, waste management is almost completely reactive. Sanitation crews discover waste overflows and illegal dumping only after heaps become visible or residents complain.*
+> *Municipal waste operations in modern cities are almost entirely reactive. Sanitation fleets only discover overflows and illegal dumping after heaps become visible, odor spreads, or residents complain.*
 > 
-> *When uncollected waste sits for more than 48 hours, it rots into potent methane gas—28 times more warming than CO2—and frustrated communities often burn the piles in open air, choking neighborhoods with toxic PM2.5 and dioxins. Meanwhile, reactive garbage trucks burn thousands of gallons of excess diesel making chaotic emergency runs.*
+> *When waste stagnates due to route delays, frustrated communities often torch the piles in open air, choking neighborhoods with toxic PM2.5 and dioxins. Meanwhile, informal recyclers lose valuable materials to decomposition, and reactive garbage trucks burn excess diesel making chaotic emergency runs.*
 > 
 > *WasteSignal changes this with a core directive: Don't clean the next hotspot. Predict it."*
 
 ---
 
-### [0:35 – 1:10] Part 2: Architecture & Built on AWS
+### [0:25 – 0:45] Part 2: WasteSignal Landing Page & Architecture
 
 **Screen to show:**
-- Scroll down to the **"AWS Cloud Architecture Pipeline"** section on the landing page, or open `http://localhost:3001/api/aws/status` in another tab to show the JSON response.
+- Scroll down to the **"Architecture Pipeline"** section or show `/api/aws/status` tab.
 
 **Voiceover Script:**
 > *"WasteSignal is built on enterprise AWS primitives in our selected Region, ap-southeast-2.*
 > 
-> *Raw municipal telemetry flows into Amazon S3 data lake buckets. AWS Glue automatically catalogs our schemas into the wastesignal_db catalog. Amazon Athena executes serverless SQL queries to analyze historical recurrence.*
+> *Raw municipal telemetry flows into Amazon S3 buckets. AWS Glue automatically registers and manages the operational_telemetry schema in our Glue Data Catalog. Amazon Athena runs serverless interactive SQL queries over historical recurrence patterns.*
 > 
-> *Our statistical recurrence engine forecasts a 7-day forward risk window, and Amazon Bedrock generates grounded, hallucination-free operational explanations.*
-> 
-> *The entire API is packaged as a serverless AWS Lambda handler with zero credentials exposed to the frontend."*
+> *Our statistical recurrence engine forecasts a 7-day forward risk window, and Amazon Bedrock generates grounded, zero-hallucination operational explanations—with zero AWS credentials exposed to the browser."*
 
 ---
 
-### [1:10 – 1:45] Part 3: Live Ingestion & Predictive Dashboard
+### [0:45 – 1:10] Part 3: Dataset Ingestion and Validation
 
 **Screen to show:**
-- Scroll to the top and click **"⚡ 1-Click Judge Demo"**.
-- The app immediately logs in and opens `http://localhost:5173/dashboard`.
-- Show the synchronized map, zone halos, and the dynamic KPI strip.
+- Scroll to top of Landing Page and click **"⚡ 1-Click Judge Demo"**.
+- App logs in instantly and opens `http://localhost:5173/dashboard?demo=judge`.
+- Highlight the top banner: **"SYNTHETIC DEMONSTRATION DATA — S3 BUCKET & GLUE CATALOG ACTIVE"**.
+- Quickly click **"Data Sources"** in the sidebar to show the uploaded S3 key and Glue schema.
 
 **Voiceover Script:**
-> *"With our 1-Click Judge Demo, we immediately enter the operational workspace.*
+> *"With our 1-Click Judge Demo, we enter the workspace with a pre-seeded benchmark dataset.*
 > 
-> *Right at the top, our banner confirms that live Amazon S3 storage and AWS Glue tables are active. On the map, municipal zones are dynamically categorized by an explainable 0 to 100 risk score.*
+> *The top banner immediately confirms our live AWS connection: telemetry is stored in our S3 bucket and registered in the Glue Catalog under wastesignal_db.*
 > 
-> *Notice Transit Hub South in Zone Z-09 and Industrial Sector East in Z-07. The system detected 8 active hotspots and generated 42 forward predictions across a 7-day horizon, identifying collection delays and surging volumes before street overflows materialize."*
+> *Notice our transparent label: SYNTHETIC DEMONSTRATION DATA. We never confuse prototype evaluation benchmarks with uncalibrated field claims."*
 
 ---
 
-### [1:45 – 2:20] Part 4: Transparent Bedrock AI & Action Drawer
+### [1:10 – 1:40] Part 4: Hotspot Scoring and 7-Day Prioritization
 
 **Screen to show:**
-- Click on **Zone Z-09 (Transit Hub South)** on the map or in the priority table.
-- The **Hotspot Drawer** slides out from the right.
-- Highlight the three sections:
+- Return to **Overview** (`/dashboard`).
+- Hover over the 3D map halos: Zone Z-09 (Transit Hub South) and Zone Z-07.
+- Point to the priority ranking list and dynamic KPI strip.
+
+**Voiceover Script:**
+> *"On our live map, municipal sectors are color-coded by an explainable 0 to 100 risk score.*
+> 
+> *This score is not a black box and not an uncalibrated probability—it is a deterministic multi-signal ranking combining recurrence frequency, recent volume surges, and collection delays.*
+> 
+> *Notice Transit Hub South in Zone Z-09 at risk score 72. Our engine detected 8 active hotspots and generated 42 forward predictions across a 7-day planning horizon, giving dispatchers days of advance notice before street overflows escalate."*
+
+---
+
+### [1:40 – 2:05] Part 5: Hotspot Explanation & Bedrock/Fallback Distinction
+
+**Screen to show:**
+- Click **Zone Z-09 (Transit Hub South)** on the map or in the table.
+- The **Hotspot Drawer** slides out.
+- Highlight:
   1. "Why is this a hotspot?"
   2. "What signals contributed?"
-  3. "Bedrock AI Explanation" & "What should the operator do?"
+  3. "Bedrock AI Explanation" & the badge (`RULE-BASED FALLBACK` or `AMAZON_BEDROCK`).
 
 **Voiceover Script:**
-> *"When a supervisor clicks Zone Z-09, the Hotspot Drawer opens. Everything here is transparent and explainable—no black-box guessing.*
+> *"Clicking Zone Z-09 opens the Hotspot Inspection Drawer. Everything here is grounded in real telemetry.*
 > 
-> *It breaks down the exact contributing signals: 3 recurring incidents, an average collection delay of 48 minutes, and volume pressure.*
+> *It breaks down the root causes: 3 recurring incidents, an average collection delay of 48 minutes, and commercial volume pressure.*
 > 
-> *Here, Amazon Bedrock synthesizes the root cause and provides a concrete recommendation: advance the compactor route by 45 minutes and deploy an additional container prior to peak transit hours."*
+> *Here, the explanation layer recommends advancing the route schedule by 45 minutes before evening peak hours.*
+> 
+> *Notice our transparent tag: because model activation is pending in our AWS Bedrock console, WasteSignal gracefully activates a rule-based fallback without ever faking an AI response."*
 
 ---
 
-### [2:20 – 2:45] Part 5: The Operational Feedback Loop
+### [2:05 – 2:35] Part 6: Operational Intervention & Persistent State Change
 
 **Screen to show:**
-- Click **"Operations"** in the left sidebar (`/operations`).
-- Find the intervention for Zone Z-09 (`INT-Z09`).
-- Change the status dropdown from `PENDING` to `IN PROGRESS`.
-- Show the notes: *"Dispatched compaction vehicle V-12"*.
+- Click **"Operations"** in the sidebar (`/operations`).
+- Locate intervention `INT-Z09`.
+- Change dropdown from `PENDING` to `IN PROGRESS`.
+- Refresh the page to show persistence.
+- Change dropdown from `IN PROGRESS` to `RESOLVED`.
+- Return to **Overview** (`/dashboard`) to show updated KPI counts.
 
 **Voiceover Script:**
-> *"Under the Operations tab, WasteSignal establishes a closed feedback loop.*
+> *"In the Operations module, WasteSignal closes the operational loop.*
 > 
-> *Interventions are staged automatically. Dispatchers can assign crews and update statuses in real time from Pending to In Progress and Resolved.*
+> *Interventions are staged automatically from risk predictions. Dispatchers follow a strict state machine: Pending, Assigned, In Progress, and Resolved.*
 > 
-> *This ensures field crews take preventative action days before citizen complaints arise."*
+> *Let's dispatch Crew C-4 to Zone Z-09 by moving status to In Progress. If we refresh, the state persists in our backend data store.*
+> 
+> *Once field crews clear the site before overflow occurs, we mark it Resolved. Returning to the overview shows our live KPIs updated immediately."*
 
 ---
 
-### [2:45 – 3:00] Part 6: Measurable Impact & Closing
+### [2:35 – 3:00] Part 7: Environmental Measurement Plan & Closing
 
 **Screen to show:**
-- Click on **"Platform Settings"** (`/settings`) or navigate back to the landing page **Environmental Impact** ribbon.
-- End on the clean, full-screen view.
+- Click **"Platform Settings"** (`/settings`) or navigate to Landing Page **Impact Ribbon**.
+- Show the 5-metric pilot framework and literature citations.
 
 **Voiceover Script:**
-> *"What changes for the people living with this? Neighborhoods stay clean, children aren't exposed to toxic open-burning smoke, and informal recyclers receive advance signals to salvage clean recyclables before contamination.*
+> *"What is the real-world outcome? Clean school corridors, reduced illegal trash fires, and advance volume warnings for informal recyclers to salvage clean materials before wet contamination.*
 > 
-> *By cutting reactive emergency scrambles, WasteSignal slashes municipal fleet diesel emissions by 35% and prevents over 18 metric tons of CO2 equivalent per sector annually.*
+> *In our documented pilot measurement framework, predictive scheduling targets a 15 to 35% reduction in diesel transit miles and verifiable avoidance of open burning.*
 > 
-> *WasteSignal: Built on AWS, designed for real cities. Thank you!"*
+> *WasteSignal: Built on AWS, tested for real cities. Thank you!"*
 
 ---
 
 ### Recording Checklist for the Creator:
 - [ ] Browser window sized to 1920x1080 (16:9).
-- [ ] Dev server running (`npm run dev`) with backend on `:3001` and client on `:5173`.
-- [ ] Clear browser cache or use an Incognito / clean Safari or Chrome window.
+- [ ] Local dev server running (`npm run dev`) with backend on `:3001` and client on `:5173`.
+- [ ] Clear browser cache or use an Incognito window.
 - [ ] Microphone tested with low background noise.
 - [ ] Rehearse twice with a stopwatch to hit the exact 3-minute mark.

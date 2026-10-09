@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import KPIStrip from '../components/KPIStrip';
 import MapVisualization from '../components/MapVisualization';
 import HotspotDrawer from '../components/HotspotDrawer';
@@ -8,9 +9,16 @@ import type { Hotspot } from '../types';
 import './Overview.css';
 
 export default function Overview() {
-  const { dataMode, sourceLabel, hotspots, predictions, interventions, insights } = useWasteData();
+  const location = useLocation();
+  const { dataMode, sourceLabel, hotspots, predictions, interventions, insights, loadDemoData } = useWasteData();
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (location.search.includes('demo=judge') && dataMode === 'NONE') {
+      loadDemoData();
+    }
+  }, [location.search, dataMode, loadDemoData]);
 
   // Derived metrics from actual data
   const hasData = dataMode !== 'NONE';

@@ -3,6 +3,7 @@ import { useWasteData } from '../data/DataContext';
 import EmptyState from '../components/EmptyState';
 import AwsStatusCard from '../components/AwsStatusCard';
 import { parseCSV, parseJSON } from '../data/analysisEngine';
+import { apiFetch } from '../utils/api';
 import type { WasteRecord } from '../types';
 import './DataSources.css';
 
@@ -121,13 +122,12 @@ export default function DataSources() {
     setAthenaResults(null);
 
     try {
-      const res = await fetch('/api/aws/query', {
+      const data = await apiFetch<any>('/api/aws/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ queryType }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      if (data.success) {
         setAthenaResults({ queryExecutionId: data.queryExecutionId, rows: data.rows });
       } else {
         setAthenaResults({ error: data.error || data.details || 'Athena query execution failed' });

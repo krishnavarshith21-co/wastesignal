@@ -21,8 +21,27 @@ In tropical and warm urban environments, uncollected municipal waste left standi
 
 ### 2. What changes for the people living with it?
 - **Families & School Children in Urban Neighborhoods:** Eliminates chronic open waste dumps outside school gates and residential apartment blocks. Stops toxic open-air burning smoke from polluting children's bedrooms. Drastically reduces mosquito-borne disease vectors (dengue, chikungunya).
-- **Informal Recyclers & Waste Pickers:** Over 80% of urban recycling in emerging markets is collected by informal pickers. When waste sits in uncollected piles, organic fluids contaminate clean cardboard, paper, and plastics, making them unrecyclable and hazardous to sort. WasteSignal provides **early volume signals** allowing informal recycling cooperatives to collect clean, segregated recyclables **before** compactor trucks crush them into contaminated landfill loads.
+- **Informal Recyclers & Waste Pickers:** Over 80% of urban recycling in emerging markets is collected by informal pickers (UN-Habitat / World Bank). When waste sits in uncollected piles, organic fluids contaminate clean cardboard, paper, and plastics, making them unrecyclable and hazardous to sort. WasteSignal provides **early volume signals** allowing informal recycling cooperatives to collect clean, segregated recyclables **before** compactor trucks crush them into contaminated landfill loads.
 - **Sanitation Crews & Municipal Operators:** Transforms high-stress, hazardous emergency overtime cleanups into predictable, daylight preventative maintenance routes—cutting crew injuries and overtime municipal expenditure by over 40%.
+
+### 3. What is genuinely novel about WasteSignal?
+1. **Explainable Grounding Over Black-Box Hallucinations:** Unlike generic LLM chat wrappers, WasteSignal's scoring engine is 100% deterministic ($0–100$). Amazon Bedrock is used strictly as a grounded operational synthesist that receives structured multi-signal telemetry (delays, volumes, repeats) and is constrained against inventing facts.
+2. **Periodic Cadence Forecasting:** Instead of reactive threshold triggers, WasteSignal models arrival interval volatility ($\bar{\Delta t}$) across historical event cycles, predicting when a sector will recur within a 7-day operational horizon.
+3. **Closing the Circular Loop Before Compaction:** Identifies surge sectors early so that recyclable dry materials can be diverted to decentralized sorting cooperatives *before* standard hydraulic compaction trucks permanently soil them with wet organics.
+
+### 4. Known Limitations Disclosed
+- **Risk Score vs Probability:** The 0–100 score is a heuristic prioritization index, not a calibrated statistical probability.
+- **Prototype Horizon:** The 7-day forward horizon is an operational prototype heuristic tailored to municipal shift cycles, not a verified stochastic forecast.
+- **Amazon Bedrock Activation:** Requires one-click model authorization in the AWS Bedrock Console for new projects. Until authorized, the application transparently activates its deterministic rule-based fallback tagged as `RULE_BASED_FALLBACK`.
+- **Amazon SageMaker:** Architecture defines the production inference interface in `server/aws/sagemakerService.ts`, but hosting is transparently labeled **NOT CONFIGURED** until 90 days of operational pilot data are gathered.
+
+### 5. Empirical Pilot Impact-Measurement Plan
+Detailed in [`docs/environmental-impact-methodology.md`](file:///Users/krishnavarshithkamanaboina/Desktop/aws/docs/environmental-impact-methodology.md), field trials will evaluate:
+- **Baseline Hotspot Recurrence ($R_{\text{recurrence}}$):** Ratio of repeat incidents in 250m geofenced zones over rolling 14-day windows.
+- **Response Latency ($T_{\text{latency}}$):** Elapsed time from predictive alert to completed operational action.
+- **Vehicle Kilometers Traveled (VKT) & Fuel Burn:** CAN-bus/OBD-II vehicle telematics to measure diesel savings (literature potential: 15–35%).
+- **Segregated Material Recovery:** Weighbridge diversion of unsoiled cardboard/plastics before mixed compaction.
+- **Avoided Open Burning Callouts:** Municipal incident logs correlated with local optical PM2.5 particulate surges.
 
 ---
 
@@ -88,7 +107,7 @@ WasteSignal is built on enterprise AWS cloud primitives deployed in the selected
 | **Amazon S3** | `wastesignal-data-683023468572-ap-southeast-2` | **CONNECTED** (Live objects under `/raw/` and `/demo/`) |
 | **AWS Glue** | Catalog Database: `wastesignal_db`<br>Table: `operational_telemetry` | **CONNECTED** (17-column external schema) |
 | **Amazon Athena** | Workgroup: `primary` (Engine v3)<br>Output: S3 `/athena-results/` | **CONNECTED** (Ad-hoc SQL query execution) |
-| **Amazon Bedrock** | Model: `amazon.nova-micro-v1:0` / Claude | **CONNECTED** (Prompt engineering with structured fallback) |
+| **Amazon Bedrock** | Model: `amazon.nova-micro-v1:0` / Claude | **UNAVAILABLE** *(Model access pending AWS Console activation; rule-based fallback active)* |
 | **AWS Lambda** | Packaged in `server/lambda.ts` | **READY** (Event-driven API Gateway integration) |
 | **LocalStack / Mock** | Built-in offline emulation layer | **COMPATIBLE** (Judges can run with zero AWS bills) |
 
@@ -146,7 +165,7 @@ The complete word-for-word, 180-second recording script and screen storyboard is
 | **1:10 – 1:45** | **Live Data Ingestion & 7-Day Model** | Click "1-Click Judge Demo" → Map & Timeline | Live upload to S3; 8 hotspots scored; 42 forward predictions generated across the 7-day horizon. |
 | **1:45 – 2:20** | **Bedrock AI & Action Drawer** | Click Hotspot Z-09 (Transit Hub South) | Transparent explainability drawer: Recurrence metrics, Bedrock recommendations, zero hallucinations. |
 | **2:20 – 2:45** | **Operations Feedback Loop** | Operations tab → Update status to "IN PROGRESS" | Staging preventative interventions; closing the operational loop. |
-| **2:45 – 3:00** | **Environmental Impact & Closing** | Impact metrics ribbon | 18.4 Tons CO₂e prevented, 35% diesel cut, empowering informal recyclers. |
+| **2:45 – 3:00** | **Environmental Impact & Closing** | Impact metrics ribbon | Pilot simulation targets (18.4 T CO₂e avoidance, 15-35% fleet routing benchmark, informal recycler support). |
 
 ---
 

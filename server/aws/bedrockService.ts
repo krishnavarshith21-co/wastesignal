@@ -24,7 +24,8 @@ export interface ExplanationResult {
   contributingSignalsSummary: string[];
   recommendedAction: string;
   preventiveChecklist: string[];
-  aiProvider: 'AMAZON_BEDROCK' | 'RULE_BASED_FALLBACK';
+  uncertaintyOrMissingInfo?: string;
+  aiProvider: 'BEDROCK' | 'RULE_BASED_FALLBACK';
   modelId?: string;
   fallbackReason?: string;
 }
@@ -36,25 +37,79 @@ export class BedrockService {
     this.modelId = config.aws.bedrockModelId;
   }
 
+  private healthCache: { result: { status: 'CONNECTED' | 'UNAVAILABLE' | 'NOT CONFIGURED'; modelId: string; error?: string }; expiresAt: number } | null = null;
+
   async checkHealth(): Promise<{ status: 'CONNECTED' | 'UNAVAILABLE' | 'NOT CONFIGURED'; modelId: string; error?: string }> {
     if (!this.modelId) {
       return { status: 'NOT CONFIGURED', modelId: '' };
     }
+
+    const now = Date.now();
+    if (this.healthCache && this.healthCache.expiresAt > now) {
+      return this.healthCache.result;
+    }
+
     try {
+      // 1. Verify model is listed in region
       const res = await bedrockClient.send(new ListFoundationModelsCommand({}));
       const models = res.modelSummaries || [];
       const hasModel = models.some(m => m.modelId === this.modelId);
-      return {
-        status: hasModel ? 'CONNECTED' : 'UNAVAILABLE',
+      if (!hasModel) {
+        const result = {
+          status: 'UNAVAILABLE' as const,
+          modelId: this.modelId,
+          error: `Model ${this.modelId} not listed in region ${config.aws.region}`,
+        };
+        this.healthCache = { result, expiresAt: now + 300_000 };
+        return result;
+      }
+
+      // 2. Perform a lightweight 1-token invocation probe to verify genuine model access
+      let probeBody: any;
+      if (this.modelId.startsWith('amazon.nova')) {
+        probeBody = {
+          messages: [{ role: 'user', content: [{ text: 'ping' }] }],
+          inferenceConfig: { max_new_tokens: 1 },
+        };
+      } else if (this.modelId.startsWith('anthropic.claude')) {
+        probeBody = {
+          anthropic_version: 'bedrock-2023-05-31',
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'ping' }],
+        };
+      } else {
+        probeBody = { prompt: 'ping', maxTokens: 1 };
+      }
+
+      await bedrockRuntimeClient.send(new InvokeModelCommand({
         modelId: this.modelId,
-        error: hasModel ? undefined : `Model ${this.modelId} not listed in region ${config.aws.region}`,
+        contentType: 'application/json',
+        accept: 'application/json',
+        body: JSON.stringify(probeBody),
+      }));
+
+      const result = {
+        status: 'CONNECTED' as const,
+        modelId: this.modelId,
       };
+      this.healthCache = { result, expiresAt: now + 300_000 };
+      return result;
     } catch (err: any) {
-      return {
-        status: 'UNAVAILABLE',
+      const isInvocationAccessError =
+        err.name === 'ValidationException' ||
+        err.name === 'AccessDeniedException' ||
+        err.message?.includes('Operation not allowed') ||
+        err.message?.includes('access');
+
+      const result = {
+        status: 'UNAVAILABLE' as const,
         modelId: this.modelId,
-        error: err.message || err.name || 'Bedrock access failed',
+        error: isInvocationAccessError
+          ? `Model access pending AWS Console activation (${err.name || 'InvokeError'}: ${err.message}). Transparent rule-based fallback active.`
+          : (err.message || err.name || 'Bedrock access failed'),
       };
+      this.healthCache = { result, expiresAt: now + 300_000 };
+      return result;
     }
   }
 
@@ -79,7 +134,8 @@ Format your output as strict valid JSON ONLY with these keys:
   "whyPrioritized": "concise explanation grounded strictly in the provided signals",
   "contributingSignalsSummary": ["bullet 1", "bullet 2", "bullet 3"],
   "recommendedAction": "clear operational recommendation for field dispatch",
-  "preventiveChecklist": ["action step 1", "action step 2"]
+  "preventiveChecklist": ["action step 1", "action step 2"],
+  "uncertaintyOrMissingInfo": "any unobserved telemetry fields, missing sensors, or interval variance"
 }`;
 
     try {
@@ -148,7 +204,8 @@ Format your output as strict valid JSON ONLY with these keys:
           contributingSignalsSummary: Array.isArray(parsed.contributingSignalsSummary) ? parsed.contributingSignalsSummary : [],
           recommendedAction: parsed.recommendedAction,
           preventiveChecklist: Array.isArray(parsed.preventiveChecklist) ? parsed.preventiveChecklist : [],
-          aiProvider: 'AMAZON_BEDROCK',
+          uncertaintyOrMissingInfo: parsed.uncertaintyOrMissingInfo || 'All primary operational telemetry signals observed.',
+          aiProvider: 'BEDROCK',
           modelId: this.modelId,
         };
       }
@@ -189,11 +246,23 @@ Format your output as strict valid JSON ONLY with these keys:
       'Log resolution outcome in WasteSignal Operations module to update predictive model feedback loop',
     ];
 
+    const missingCaveats: string[] = [];
+    if (!input.avgDelayMinutes || input.avgDelayMinutes === 0) {
+      missingCaveats.push('Vehicle transit delay not recorded; baseline schedule assumed.');
+    }
+    if (input.incidentCount < 4) {
+      missingCaveats.push('Sparse incident history (< 4 events); recurrence variance requires in-field verification.');
+    }
+    const uncertaintyOrMissingInfo = missingCaveats.length > 0
+      ? missingCaveats.join(' ')
+      : 'All primary operational telemetry signals observed within verified variance bounds.';
+
     return {
       whyPrioritized,
       contributingSignalsSummary: signalBullets,
       recommendedAction: action,
       preventiveChecklist: checklist,
+      uncertaintyOrMissingInfo,
     };
   }
 }

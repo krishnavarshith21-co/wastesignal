@@ -72,8 +72,13 @@ operationsRouter.patch('/interventions/:id', (req: Request, res: Response) => {
     }
 
     const updated = operationsEngine.updateStatus(id, status, assignedTo, notes);
+    const active = dataStore.getActive();
+    if (active) {
+      active.interventions = operationsEngine.getAll();
+    }
     return res.json({ success: true, intervention: updated });
   } catch (err: any) {
-    return res.status(404).json({ error: err.message });
+    const statusCode = err.message?.includes('Invalid state transition') ? 400 : 404;
+    return res.status(statusCode).json({ error: err.message });
   }
 });
